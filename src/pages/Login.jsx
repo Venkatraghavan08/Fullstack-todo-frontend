@@ -1,1 +1,44 @@
-import React,{useState} from 'react';import {useNavigate} from 'react-router-dom';export default function Login({onLogin}){const [username,setUsername]=useState('admin');const [password,setPassword]=useState('1234');const [error,setError]=useState(null);const navigate=useNavigate();const submit=async e=>{e.preventDefault();setError(null);try{const res=await fetch('https://fullstack-todo-backend-1-99kc.onrender.com/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});const data=await res.json();if(!res.ok) throw new Error(data.error||'Login failed');onLogin(data.token,data.user);navigate(data.user.role==='admin'?'/admin':'/user');}catch(e){setError(e.message);}};return(<div className='card' style={{maxWidth:420}}><h2>Login</h2><form onSubmit={submit}><div style={{display:'grid',gap:12}}><input className='input' placeholder='Username' value={username} onChange={e=>setUsername(e.target.value)}/><input className='input' type='password' placeholder='Password' value={password} onChange={e=>setPassword(e.target.value)}/>{error&&<div className='badge rejected'>{error}</div>}<button className='primary' type='submit'>Sign in</button></div></form><p style={{marginTop:12,color:'#6b7280'}}>Use admin/user with password 1234 after seeding.</p></div>);}
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+export default function Login({ onLogin }) {
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('1234');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const API_BASE = "https://fullstack-todo-backend-1-99kc.onrender.com";
+
+  const submit = async e => {
+    e.preventDefault();
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+      onLogin(data.token, data.user);
+      navigate(data.user.role === 'admin' ? '/admin' : '/user');
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  return (
+    <div className='card' style={{ maxWidth: 420 }}>
+      <h2>Login</h2>
+      <form onSubmit={submit}>
+        <div style={{ display: 'grid', gap: 12 }}>
+          <input className='input' placeholder='Username' value={username} onChange={e => setUsername(e.target.value)} />
+          <input className='input' type='password' placeholder='Password' value={password} onChange={e => setPassword(e.target.value)} />
+          {error && <div className='badge rejected'>{error}</div>}
+          <button className='primary' type='submit'>Sign in</button>
+        </div>
+      </form>
+      <p style={{ marginTop: 12, color: '#6b7280' }}>Use admin/user with password 1234 after seeding.</p>
+    </div>
+  );
+}
